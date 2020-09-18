@@ -15,6 +15,12 @@ def get_concordance(body=None):  # noqa: E501
 
     :rtype: Result
     """
+    print("-----------------")
+    print("Inside the get_concordance method")
+    print(body)
+    print("-----------------")
+    print("")
+
     if connexion.request.is_json:
         body = str.from_dict(connexion.request.get_json())  # noqa: E501
-    return 'do some magic!'
+    return 'I am doing the homework!'

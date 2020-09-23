@@ -1,12 +1,20 @@
 import connexion
 import string
-import six
 
 from swagger_server.models.result import Result  # noqa: E501
-from swagger_server import util
 
 
-def format_concordance(incoming_concordance={}):
+def format_concordance(incoming_concordance=None):
+    """ Format Concordance
+
+    :param incoming_concordance: The dictionary of the concordance
+    :type incoming_concordance: dict
+
+    return the formatted concordance
+
+    """
+    if incoming_concordance is None:
+        return {}
     concordance = {
         'concordance': [
         ]
@@ -17,19 +25,29 @@ def format_concordance(incoming_concordance={}):
             'token': token,
             'count': count
         })
-
     return concordance
 
 
 def sort_concordance(body=None):
+    """Sort Concordance
+
+    Takes in the posted text array and gets concordance
+
+    :param body: Text array to be analyzed
+    :type body: string array
+
+    :rtype: Result
+    """
+    if body is None:
+        return None
     concordance = {}
 
     for word in body:
         if word in concordance:
             concordance[word] += 1
         else:
-            concordance[word] = 1
-
+            if not word == "":
+                concordance[word] = 1
     return concordance
 
 
@@ -43,42 +61,36 @@ def get_concordance(body=None):  # noqa: E501
 
     :rtype: Result
     """
-    print("-----------------")
-    print("Inside the get_concordance method")
-    print(body)
-    print(type(body))
-    print("-----------------")
+    # print("-----------------")
+    # print("Inside the get_concordance method")
+    # print(body)
 
     # handle invalid inputs
     if connexion.request.is_json:
         body = str.from_dict(connexion.request.get_json())  # noqa: E501
+        words = body
     if type(body) == bytes:
         words = str(body, "utf-8")
 
-    input = words
-    print(input)
+    body_input = words
+    # print(body_input)
 
+    # split, removed punctuation and numeric chars from each word and sorted
+    words = ''.join(ch for ch in words if not ch.isdigit())
     words = words.lower().split()
-    print("----------------- SPLIT")
-    print(words)
-
-    # remove punctuation from each word
     punct_table = str.maketrans('', '', string.punctuation)
-    stripped = [w.translate(punct_table) for w in words]
-    print("----------------- FORMATTED")
-    print(stripped)
+    words = [w.translate(punct_table) for w in words]
+    words.sort()
 
-    stripped.sort()
-    print("----------------- SORTED")
-    print(stripped)
+    if not words:
+        return {}
 
-    concordance = sort_concordance(stripped)
-    print("----------------- CONCORDANCE")
-    print(concordance)
-
+    # sort the concordance dict and format it
+    concordance = sort_concordance(words)
     concordance = format_concordance(concordance)
-    concordance['input'] = input
-    print("----------------- Final Formatted CONCORDANCE")
-    print(concordance)
+    concordance['input'] = body_input
+
+    # print('----------------- Final Formatted CONCORDANCE')
+    # print(concordance)
 
     return concordance

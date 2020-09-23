@@ -67,7 +67,7 @@ def get_concordance(body=None):  # noqa: E501
 
     # handle invalid inputs
     if connexion.request.is_json:
-        body = str.from_dict(connexion.request.get_json())  # noqa: E501
+        body = str(connexion.request.get_json())  # noqa: E501
         words = body
     if type(body) == bytes:
         words = str(body, "utf-8")

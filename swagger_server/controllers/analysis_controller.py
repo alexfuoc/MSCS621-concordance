@@ -1,7 +1,9 @@
 import connexion
+import six
 import string
 
-from swagger_server.models.result import Result  # noqa: E501
+from swagger_server.models.analysis_result import AnalysisResult  # noqa: E501
+from swagger_server import util
 
 
 def format_concordance(incoming_concordance=None):
@@ -59,7 +61,7 @@ def get_concordance(body=None):  # noqa: E501
     :param body: Text to be analyzed
     :type body: dict | bytes
 
-    :rtype: Result
+    :rtype: AnalysisResult
     """
     # print("-----------------")
     # print("Inside the get_concordance method")
@@ -67,8 +69,8 @@ def get_concordance(body=None):  # noqa: E501
 
     # handle invalid inputs
     if connexion.request.is_json:
-        body = str(connexion.request.get_json())  # noqa: E501
-        words = body
+        body = str.from_dict(connexion.request.get_json())  # noqa: E501
+    words = body
     if type(body) == bytes:
         words = str(body, "utf-8")
 

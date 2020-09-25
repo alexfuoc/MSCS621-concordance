@@ -38,7 +38,7 @@ def find_location(body=None):
     inputted_words = []
 
     for word in body:
-        if word not in inputted_words:
+        if word not in inputted_words and word != '':
             location.append({
                 'token': word,
                 'location': [i for i, x in enumerate(body) if x == word]
@@ -69,7 +69,6 @@ def get_location(body=None):  # noqa: E501
         words = str(body, "utf-8")
 
     body_input = words
-    # print(body_input)
 
     # split, removed punctuation and numeric chars from each word and sorted
     words = ''.join(ch for ch in words if not ch.isdigit())
@@ -82,11 +81,7 @@ def get_location(body=None):  # noqa: E501
 
     # sort the words array and format for locations
     location = find_location(words)
-    print(location)
-    print('---------------------------')
-    print()
     location = {'location': sorted(location, key=itemgetter('token'))}
     location['input'] = body_input
-    print(location)
 
     return location

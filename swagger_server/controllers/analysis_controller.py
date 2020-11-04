@@ -1,7 +1,11 @@
 import connexion
+import six
 import string
+import swagger_server.controllers.aws_controller as aws
+from hashlib import blake2b
 
-from swagger_server.models.result import Result  # noqa: E501
+from swagger_server.models.analysis_result import AnalysisResult  # noqa: E501
+from swagger_server import util
 
 
 def format_concordance(incoming_concordance=None):
@@ -59,21 +63,23 @@ def get_concordance(body=None):  # noqa: E501
     :param body: Text to be analyzed
     :type body: dict | bytes
 
-    :rtype: Result
+    :rtype: AnalysisResult
     """
-    # print("-----------------")
-    # print("Inside the get_concordance method")
-    # print(body)
 
     # handle invalid inputs
     if connexion.request.is_json:
-        body = str(connexion.request.get_json())  # noqa: E501
-        words = body
+        body = str.from_dict(connexion.request.get_json())  # noqa: E501
+    words = body
     if type(body) == bytes:
+        input_byte_length = len(body)
         words = str(body, "utf-8")
-
     body_input = words
-    # print(body_input)
+
+    # Query DB for input
+    db_result = aws.get_concordance(words)
+    if db_result is not None:
+        print("already uploaded, returning from db")
+        return db_result
 
     # split, removed punctuation and numeric chars from each word and sorted
     words = ''.join(ch for ch in words if not ch.isdigit())
@@ -90,7 +96,7 @@ def get_concordance(body=None):  # noqa: E501
     concordance = format_concordance(concordance)
     concordance['input'] = body_input
 
-    # print('----------------- Final Formatted CONCORDANCE')
-    # print(concordance)
+    # add concordance to the DB, hashing if input is too big, 2048 bytes is max for key
+    aws.put_concordance(concordance)
 
     return concordance

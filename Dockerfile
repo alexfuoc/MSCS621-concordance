@@ -1,16 +1,14 @@
-FROM python:3.6-alpine
+FROM python:3.8
 
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
+RUN mkdir -p /mscs621-concordance
+WORKDIR /mscs621-concordance
 
-COPY requirements.txt /usr/src/app/
+COPY requirements.txt /mscs621-concordance/
 
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-COPY . /usr/src/app
+COPY . /mscs621-concordance
 
 EXPOSE 8080
 
-ENTRYPOINT ["python3"]
-
-CMD ["-m", "swagger_server"]
+CMD ["uwsgi", "/mscs621-concordance/uwsgi.ini"]

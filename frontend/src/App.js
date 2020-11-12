@@ -1,4 +1,5 @@
 import "./App.css";
+import services from "./services";
 import React, { Component } from "react";
 
 export class App extends Component {
@@ -18,21 +19,28 @@ export class App extends Component {
   }
 
   handleSubmit(event) {
-    alert("A name was submitted: " + this.state.value);
-    fetch("http://localhost:8080/mscs721/concordance/1.0.0/analyze", {
+    fetch(`${services.host}/mscs721/concordance/1.0.0/analyze`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "text/plain",
       },
       body: JSON.stringify(this.state.value),
     })
-      .then((response) => {
-        console.log(response);
-        response.json();
+      .then((res) => {
+        console.log(res);
+        console.log(res.text);
+        return res.text();
       })
-      .then((result) => {
-        console.log("Success:", result);
-        this.setState({ concordanceResponse: result });
+      .then((body) => {
+        try {
+          return JSON.parse(body);
+        } catch {
+          return { error: "Error: Try again" };
+        }
+      })
+      .then((res) => {
+        console.log("Success:", res);
+        this.setState({ concordanceResponse: res });
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -55,7 +63,7 @@ export class App extends Component {
           <input type="submit" value="Submit" />
         </form>
         <hr />
-        {concordanceResponse !== null && <p>{concordanceResponse}</p>}
+        {concordanceResponse && <p>{JSON.stringify(concordanceResponse)}</p>}
       </div>
     );
   }

@@ -61,3 +61,14 @@ docker build -t mscs621-concordance .
 # starting up a container
 docker run -p 8080:8080 -e AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID> -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> -e AWS_DEFAULT_REGION=us-east-2 mscs621-concordance
 ```
+
+## Adding Fontend with Docker Compose
+
+Contains a docker-compose file, orechstrating a ReactJS frontend container and Python uWSGI backend container. It is served off of http://localhost. Note\*\* missing .env files in both frontend and backup folders
+
+To build and run both of the Docker containers, please execute the following from the root directory:
+
+```bash
+# create the images and run both containers (--build force builds a new image)
+docker-compose up --build
+```

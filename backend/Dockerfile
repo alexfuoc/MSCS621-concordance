@@ -9,6 +9,7 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY . /mscs621-concordance
 
+
 EXPOSE 8080
 
 CMD ["uwsgi", "/mscs621-concordance/uwsgi.ini"]

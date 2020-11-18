@@ -64,7 +64,7 @@ docker run -p 8080:8080 -e AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID> -e AWS_SECRET_A
 
 ## Adding Fontend with Docker Compose
 
-Contains a docker-compose file, orechstrating a ReactJS frontend container and Python uWSGI backend container. It is served off of http://localhost. Note\*\* missing .env files in both frontend and backup folders
+Contains a docker-compose file, orechstrating a ReactJS frontend container and Python uWSGI backend container. It is served off of http://localhost. Note\*\* missing .env files in both frontend and backup folders.
 
 To build and run both of the Docker containers, please execute the following from the root directory:
 

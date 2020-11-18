@@ -1,11 +1,10 @@
-import connexion
-import six
+""" The controller for the analyze endpoint. 
+Will return the concordanance based on the input."""
+import json
 import string
-import swagger_server.controllers.aws_controller as aws
-from hashlib import blake2b
 
-from swagger_server.models.analysis_result import AnalysisResult  # noqa: E501
-from swagger_server import util
+import connexion
+import swagger_server.controllers.aws_controller as aws
 
 
 def format_concordance(incoming_concordance=None):
@@ -68,10 +67,9 @@ def get_concordance(body=None):  # noqa: E501
 
     # handle invalid inputs
     if connexion.request.is_json:
-        body = str.from_dict(connexion.request.get_json())  # noqa: E501
+        body = json.loads(connexion.request.get_json())  # noqa: E501
     words = body
-    if type(body) == bytes:
-        input_byte_length = len(body)
+    if isinstance(body, bytes):
         words = str(body, "utf-8")
     body_input = words
 

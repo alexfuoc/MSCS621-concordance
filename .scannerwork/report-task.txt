@@ -1,0 +1,6 @@
+projectKey=alexfuoc-MSCS621-concordance
+serverUrl=http://ec2-54-83-197-240.compute-1.amazonaws.com:9000
+serverVersion=8.5.1.38104
+dashboardUrl=http://ec2-54-83-197-240.compute-1.amazonaws.com:9000/dashboard?id=alexfuoc-MSCS621-concordance
+ceTaskId=AXXYqxKNAzVrHh79pbM3
+ceTaskUrl=http://ec2-54-83-197-240.compute-1.amazonaws.com:9000/api/ce/task?id=AXXYqxKNAzVrHh79pbM3

@@ -1,11 +1,6 @@
-import connexion
-import string
-from operator import itemgetter
-import swagger_server.controllers.aws_controller as aws
+""" The controller for the analyze endpoint. 
+Will return the concordanance based on the input.
 
-from swagger_server.models.location_result import LocationResult  # noqa: E501
-from swagger_server import util
-'''
 Location shape
 location = {
       "input": "The brown cow...."
@@ -19,7 +14,13 @@ location = {
         },
     ]
 }
-'''  
+"""
+import json
+import string
+from operator import itemgetter
+
+import connexion
+import swagger_server.controllers.aws_controller as aws
 
 
 def find_location(body=None):
@@ -39,13 +40,15 @@ def find_location(body=None):
     inputted_words = []
 
     for word in body:
-        if word not in inputted_words and word != '':
-            location.append({
-                'token': word,
-                'location': [i for i, x in enumerate(body) if x == word]
-            })
+        if word not in inputted_words and word != "":
+            location.append(
+                {
+                    "token": word,
+                    "location": [i for i, x in enumerate(body) if x == word],
+                }
+            )
             inputted_words.append(word)
-                
+
     return location
 
 
@@ -62,9 +65,9 @@ def get_location(body=None):  # noqa: E501
 
     # handle invalid inputs
     if connexion.request.is_json:
-        body = str.from_dict(connexion.request.get_json())  # noqa: E501
+        body = json.loads(connexion.request.get_json())  # noqa: E501
     words = body
-    if type(body) == bytes:
+    if isinstance(body, bytes):
         words = str(body, "utf-8")
     body_input = words
 
@@ -75,9 +78,9 @@ def get_location(body=None):  # noqa: E501
         return db_result
 
     # split, removed punctuation and numeric chars from each word and sorted
-    words = ''.join(ch for ch in words if not ch.isdigit())
+    words = "".join(ch for ch in words if not ch.isdigit())
     words = words.lower().split()
-    punct_table = str.maketrans('', '', string.punctuation)
+    punct_table = str.maketrans("", "", string.punctuation)
     words = [w.translate(punct_table) for w in words]
 
     if not words:
@@ -85,7 +88,10 @@ def get_location(body=None):  # noqa: E501
 
     # sort the words array and format for locations
     location = find_location(words)
-    location = {'location': sorted(location, key=itemgetter('token')), 'input': body_input}
+    location = {
+        "location": sorted(location, key=itemgetter("token")),
+        "input": body_input,
+    }
 
     # add location to the DB, hashing input 2048 bytes is max for key
     aws.put_location(location)

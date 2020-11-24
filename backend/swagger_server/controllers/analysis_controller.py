@@ -4,7 +4,7 @@ import json
 import string
 
 import connexion
-import swagger_server.controllers.aws_controller as aws
+# import swagger_server.controllers.aws_controller as aws
 
 
 def format_concordance(incoming_concordance=None):
@@ -74,10 +74,10 @@ def get_concordance(body=None):  # noqa: E501
     body_input = words
 
     # Query DB for input
-    db_result = aws.get_concordance(words)
-    if db_result is not None:
-        print("already uploaded, returning from db")
-        return db_result
+    # db_result = aws.get_concordance(words)
+    # if db_result is not None:
+    #     print("already uploaded, returning from db")
+    #     return db_result
 
     # split, removed punctuation and numeric chars from each word and sorted
     words = ''.join(ch for ch in words if not ch.isdigit())
@@ -95,6 +95,6 @@ def get_concordance(body=None):  # noqa: E501
     concordance['input'] = body_input
 
     # add concordance to the DB, hashing if input is too big, 2048 bytes is max for key
-    aws.put_concordance(concordance)
+    # aws.put_concordance(concordance)
 
     return concordance

@@ -96,5 +96,6 @@ def get_concordance(body=None):  # noqa: E501
 
     # add concordance to the DB, hashing if input is too big, 2048 bytes is max for key
     # aws.put_concordance(concordance)
+    # CHANHE TO TEST TRAVIS.CI
 
     return concordance

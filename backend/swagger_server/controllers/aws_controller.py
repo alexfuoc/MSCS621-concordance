@@ -1,126 +1,132 @@
-import boto3
-from botocore.exceptions import ClientError
+""" The controller for the aws database. 
+Queries and updates the db."""
+
 from hashlib import blake2b
 
+import boto3
+from botocore.exceptions import ClientError
+
 # Get the service resource.
-dynamodb = boto3.resource('dynamodb')
+DYNMAO_DB = boto3.resource("dynamodb")
 
 # Instantiate a table resource object without actually
 # creating a DynamoDB table. Note that the attributes of this table
 # are lazy-loaded: a request is not made nor are the attribute
 # values populated until the attributes
 # on the table resource are accessed or its load() method is called.
-concordance_Table = dynamodb.Table('Concordance')
-location_Table = dynamodb.Table('Location')
+CONCORDANCE_TABLE = DYNMAO_DB.Table("Concordance")
+LOCATION_TABLE = DYNMAO_DB.Table("Location")
 
 
 def put_concordance(concordance):
     """
-        Puts concordance in the concordance table, gets HashKey first
+    Puts concordance in the concordance table, gets HashKey first
 
-        Parameters:
-        concordance (obj): concordance with attributes of input(string) and concordance(obj)
+    Parameters:
+    concordance (obj): concordance with attributes of input(string) and concordance(obj)
 
     """
     try:
-        response = concordance_Table.put_item(
+        response = CONCORDANCE_TABLE.put_item(
             Item={
-                'HashKey': get_hash_key(concordance['input']),
-                'input': concordance['input'],
-                'concordance': concordance['concordance']
+                "HashKey": get_hash_key(concordance["input"]),
+                "input": concordance["input"],
+                "concordance": concordance["concordance"],
             }
         )
-        print('Concordance put in DB', response)
+        print("Concordance put in DB", response)
     except:
-        print('Not successful input to DB')
+        print("Not successful input to DB")
 
 
 def put_location(location):
     """
-        Puts location in the location table, gets HashKey first
+    Puts location in the location table, gets HashKey first
 
-        Parameters:
-        location (obj): concordance with attributes of input(string) and location(obj)
+    Parameters:
+    location (obj): concordance with attributes of input(string) and location(obj)
     """
     try:
-        response = location_Table.put_item(
+        response = LOCATION_TABLE.put_item(
             Item={
-                'HashKey': get_hash_key(location['input']),
-                'input': location['input'],
-                'location': location['location']
+                "HashKey": get_hash_key(location["input"]),
+                "input": location["input"],
+                "location": location["location"],
             }
         )
-        print('Loction put in DB:', response)
+        print("Loction put in DB:", response)
     except:
-        print('Not successful input to DB')
+        print("Not successful input to DB")
 
 
 def get_location(body_input):
     """
-        Queries the Location table in DB for the input
+    Queries the Location table in DB for the input
 
-        Parameters:
-        input (String): Input string of location to find in DB
+    Parameters:
+    input (String): Input string of location to find in DB
 
-        Returns:
-        obj: location obj if found, None if not found
+    Returns:
+    obj: location obj if found, None if not found
     """
 
     try:
-        response = location_Table.get_item(Key={'HashKey': get_hash_key(body_input)})
-    except ClientError as e:
-        print(e.response['Error']['Message'])
+        response = LOCATION_TABLE.get_item(
+            Key={"HashKey": get_hash_key(body_input)})
+    except ClientError as err:
+        print(err.response["Error"]["Message"])
     else:
         try:
-            location = response['Item']
+            location = response["Item"]
             print("Location in DB:")
             return location
-        except KeyError as e:
-            print('Not found in DB')
+        except KeyError as err:
+            print("Not found in DB")
 
     return None
 
 
 def get_concordance(body_input):
     """
-        Queries the Concordance table in DB for the input
+    Queries the Concordance table in DB for the input
 
-        Parameters:
-        body_input (Bytes): Input bytes of concordance to find in DB
+    Parameters:
+    body_input (Bytes): Input bytes of concordance to find in DB
 
-        Returns:
-        obj: concordance obj if found, None if not found
+    Returns:
+    obj: concordance obj if found, None if not found
     """
 
     try:
-        response = concordance_Table.get_item(Key={'HashKey': get_hash_key(body_input)})
-    except ClientError as e:
-        print(e.response['Error']['Message'])
+        response = CONCORDANCE_TABLE.get_item(
+            Key={"HashKey": get_hash_key(body_input)})
+    except ClientError as err:
+        print(err.response["Error"]["Message"])
     else:
         try:
-            concordance = response['Item']
+            concordance = response["Item"]
             print("Concordance in DB:", concordance)
             return concordance
-        except KeyError as e:
-            print('Not found in DB')
+        except KeyError as err:
+            print("Not found in DB")
 
     return None
 
 
 def get_hash_key(hash_input):
     """
-        Gets the hash key for the input
+    Gets the hash key for the input
 
-        Parameters:
-        hash_input (Bytes or str): Input bytes or string to hash
+    Parameters:
+    hash_input (Bytes or str): Input bytes or string to hash
 
-        Returns:
-        str: hashed result
+    Returns:
+    str: hashed result
     """
     h = blake2b(digest_size=64)
 
     # change type to bytes
-    if type(hash_input) == str:
+    if isinstance(hash_input, str):
         hash_input = str.encode(hash_input)
 
     h.update(hash_input)

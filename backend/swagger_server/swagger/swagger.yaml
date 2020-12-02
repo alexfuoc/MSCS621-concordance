@@ -9,16 +9,16 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   version: 2.0.0
 servers:
-- url: https://virtserver.swaggerhub.com/mscs721/concordance/1.0.0
-  description: SwaggerHub API Auto Mocking
+  - url: https://virtserver.swaggerhub.com/mscs721/concordance/1.0.0
+    description: SwaggerHub API Auto Mocking
 tags:
-- name: analysis
-  description: Operations available for text analysis
+  - name: analysis
+    description: Operations available for text analysis
 paths:
   /locate:
     post:
       tags:
-      - location
+        - location
       summary: Calculate
       description: Post text to generate location of tokens
       operationId: get_location
@@ -35,14 +35,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/locationResult'
+                $ref: "#/components/schemas/locationResult"
         "400":
           description: invalid input, object invalid
       x-openapi-router-controller: swagger_server.controllers.location_controller
   /analyze:
     post:
       tags:
-      - analysis
+        - analysis
       summary: Calculate
       description: Post text to generate concordance
       operationId: get_concordance
@@ -59,21 +59,65 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/analysisResult'
+                $ref: "#/components/schemas/analysisResult"
         "400":
           description: invalid input, object invalid
       x-openapi-router-controller: swagger_server.controllers.analysis_controller
+  /nltk:
+    post:
+      tags:
+        - nltk
+      summary: Calculate
+      description: Post text to generate concordance
+      operationId: get_nltk_concordance
+      requestBody:
+        description: Text to be analyzed
+        content:
+          text/plain:
+            schema:
+              type: string
+            example: The brown fox jumped over the brown log.
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/analysisResult"
+        "400":
+          description: invalid input, object invalid
+      x-openapi-router-controller: swagger_server.controllers.nltk_controller
 components:
   schemas:
     analysisResult:
       required:
-      - concordance
-      - input
+        - concordance
+        - input
       type: object
       properties:
         concordance:
           type: array
           example:
+            - token: brown
+              count: 2
+            - token: fox
+              count: 1
+            - token: jumped
+              count: 1
+            - token: log
+              count: 1
+            - token: over
+              count: 1
+            - token: the
+              count: 2
+          items:
+            $ref: "#/components/schemas/analysisResult_concordance"
+        input:
+          type: string
+          example: The brown fox jumped over the brown log.
+      example:
+        input: The brown fox jumped over the brown log.
+        concordance:
           - token: brown
             count: 2
           - token: fox
@@ -86,83 +130,63 @@ components:
             count: 1
           - token: the
             count: 2
-          items:
-            $ref: '#/components/schemas/analysisResult_concordance'
-        input:
-          type: string
-          example: The brown fox jumped over the brown log.
-      example:
-        input: The brown fox jumped over the brown log.
-        concordance:
-        - token: brown
-          count: 2
-        - token: fox
-          count: 1
-        - token: jumped
-          count: 1
-        - token: log
-          count: 1
-        - token: over
-          count: 1
-        - token: the
-          count: 2
     locationResult:
       required:
-      - input
-      - location
+        - input
+        - location
       type: object
       properties:
         location:
           type: array
           example:
-          - token: brown
-            location:
-            - 1
-            - 6
-          - token: fox
-            location:
-            - 2
-          - token: jumped
-            location:
-            - 3
-          - token: log
-            location:
-            - 7
-          - token: over
-            location:
-            - 4
-          - token: the
-            location:
-            - 0
-            - 5
+            - token: brown
+              location:
+                - 1
+                - 6
+            - token: fox
+              location:
+                - 2
+            - token: jumped
+              location:
+                - 3
+            - token: log
+              location:
+                - 7
+            - token: over
+              location:
+                - 4
+            - token: the
+              location:
+                - 0
+                - 5
           items:
-            $ref: '#/components/schemas/locationResult_location'
+            $ref: "#/components/schemas/locationResult_location"
         input:
           type: string
           example: The brown fox jumped over the brown log.
       example:
         input: The brown fox jumped over the brown log.
         location:
-        - token: brown
-          location:
-          - 1
-          - 6
-        - token: fox
-          location:
-          - 2
-        - token: jumped
-          location:
-          - 3
-        - token: log
-          location:
-          - 7
-        - token: over
-          location:
-          - 4
-        - token: the
-          location:
-          - 0
-          - 5
+          - token: brown
+            location:
+              - 1
+              - 6
+          - token: fox
+            location:
+              - 2
+          - token: jumped
+            location:
+              - 3
+          - token: log
+            location:
+              - 7
+          - token: over
+            location:
+              - 4
+          - token: the
+            location:
+              - 0
+              - 5
     analysisResult_concordance:
       type: object
       properties:
@@ -179,4 +203,3 @@ components:
           type: array
           items:
             type: string
-
